@@ -12,11 +12,11 @@ const Imagenes = ({ Mias }) => {
 	const cargarImagenes = () => {
 		setImagenes([])
 		const db = getFirestore()
-		getDocs(Mias ? query(collection(db, "imagenes"), where("autor", "==", getAuth().currentUser.uid)) : query(collection(db, "imagenes"))).then(snapshot => {
+		getDocs(Mias ? query(collection(db, "Articulos"), where("vendedor", "==", getAuth().currentUser.email)) : query(collection(db, "Articulos"))).then(snapshot => {
 			const storage = getStorage()
 			snapshot.docs.filter((doc) => 			
 				((descripcion == "") || doc.data().descripcion.includes(descripcion)) &&
-				((hashtags == "") || hashtags.split(" ").every((item) => doc.data().descripcion.includes("#" + item)))
+				((hashtags == "") || hashtags.split(" ").every((item) => doc.data().descripcion.includes(item)))
 			).map((doc) => {
 				getDownloadURL(ref(storage, doc.id)).then((url) => {
 					setImagenes((old) => [...old, { ...doc.data(), url: url, id: doc.id, ref: doc.ref }].sort((a, b) => b.likes - a.likes))
@@ -30,7 +30,7 @@ const Imagenes = ({ Mias }) => {
 	return (
 		<>
 			<input placeholder="Texto" value={descripcion} onChange={(e) => setDescripcion(e.target.value)}></input>
-			<input placeholder="Hashtags separados por espacios" value={hashtags} onChange={(e) => setHashtags(e.target.value)}></input>
+			<input placeholder="Filtrar" value={hashtags} onChange={(e) => setHashtags(e.target.value)}></input>
 			<button onClick={cargarImagenes}>Buscar</button>
 			{
 				Imagenes != null && Imagenes.map((elem, idx) => {
@@ -43,16 +43,11 @@ const Imagenes = ({ Mias }) => {
 										Imagenes[idx].descripcion = e.target.value
 										setImagenes([...Imagenes])
 									}}></input> :
-									<p>{ elem.descripcion }</p>
+									<p>{ elem.descripcion }</p> 
+									
 							}
-							<p>Likes {elem.likes}</p>
-							<button onClick={() => {								 
-								runTransaction(getFirestore(), async (transaction) => {
-									const doc = await transaction.get(elem.ref)
-									transaction.update(elem.ref, { likes: doc.data().likes + 1 })
-								}).then(cargarImagenes)
-							}
-							}>❤️</button>
+							<p>ValorInicial {elem.precio}</p>
+							
 							{getAuth().currentUser.uid == elem.autor && 
 								<button onClick={async () => {
 									await deleteDoc(elem.ref);
