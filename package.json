@@ -12,9 +12,9 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "serve": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
-    "eject": "react-scripts --openssl-legacy-provider eject"
+    "serve": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
